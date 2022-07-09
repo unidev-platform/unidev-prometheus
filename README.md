@@ -20,7 +20,9 @@ dependencies {
 ## References
 
 https://github.com/prometheus/client_java#instrumenting
+
 https://github.com/sysdiglabs/custom-metrics-examples/blob/master/prometheus/java/src/main/java/Main.java
+
 https://sysdig.com/blog/prometheus-metrics/
 
 
