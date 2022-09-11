@@ -16,6 +16,24 @@ dependencies {
 
 ```
 
+Usage:
+```
+MetricService metricService = new MetricService(ConfigService.appName(), prometheusPort);
+
+...
+
+metricService.inc("failed-operation", Map.of("type", "read-db"));
+
+metricService.counter("template-evaluation", Map.of("template", templateName)).inc();
+
+try {
+...
+} catch(Throwable t) {
+  metricService.countException(t, Map.of("method", "dbQuery()"));
+}
+
+```
+
 
 ## References
 
