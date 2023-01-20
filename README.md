@@ -7,11 +7,13 @@ Library to expose Prometheus metrics
 ```
 ...
 repositories {
-	maven { url 'https://jitpack.io' }
+    maven {
+        url "https://mvn.universal-development.com/public" 
+    }
 }
 ...
 dependencies {
-	implementation('com.github.unidev-platform:unidev-prometheus:0.0.1')
+	implementation('com.unidev.unidev-prometheus:unidev-prometheus:0.0.1')
 }
 
 ```
