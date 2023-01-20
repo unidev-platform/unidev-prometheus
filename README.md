@@ -13,7 +13,7 @@ repositories {
 }
 ...
 dependencies {
-	implementation('com.unidev.unidev-prometheus:unidev-prometheus:0.0.1')
+	implementation('com.unidev:unidev-prometheus:0.0.1')
 }
 
 ```
