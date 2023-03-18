@@ -149,11 +149,14 @@ public class MetricService {
     }
 
     /**
-     * Count exception
+     * Count exceptions.
      */
     public void countException(Throwable t, Map<String, String> labels) {
+        TreeMap<String, String> labelMap = new TreeMap<>(labels);
+        labelMap.putAll(defaultLabels);
         String name = t.getClass().getCanonicalName();
-        counter("exception_" + name, labels).inc();
+        labelMap.put("exception", name);
+        counter("exception", labelMap).inc();
     }
 
     String[] mapKeys(Map<String, String> map) {
