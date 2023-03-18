@@ -13,6 +13,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static java.util.Collections.emptyMap;
+
 /**
  * Service used to track metrics
  */
@@ -20,6 +22,8 @@ public class MetricService {
     private final HTTPServer server;
 
     private final String prefix;
+
+    private final Map<String, String> defaultLabels;
 
     private final ConcurrentMap<String, Counter> counters = new ConcurrentHashMap<>();
 
@@ -29,13 +33,17 @@ public class MetricService {
 
     private final ConcurrentMap<String, Histogram> histograms = new ConcurrentHashMap<>();
 
-
     public MetricService(String prefix, int prometheusPort) throws IOException {
+        this(prefix, prometheusPort, emptyMap());
+    }
+
+    public MetricService(String prefix, int prometheusPort, Map<String, String> defaultLabels) throws IOException {
         this.prefix = prefix;
         DefaultExports.initialize();
-        server = new HTTPServer.Builder()
+        this.server = new HTTPServer.Builder()
                 .withPort(prometheusPort)
                 .build();
+        this.defaultLabels = defaultLabels;
     }
 
     /**
@@ -44,6 +52,7 @@ public class MetricService {
     public Counter.Child counter(String name, Map<String, String> labels) {
         try {
             TreeMap<String, String> labelMap = new TreeMap<>(labels);
+            labelMap.putAll(defaultLabels);
             String prometheusName = buildName(name);
             counters.computeIfAbsent(prometheusName, s -> {
                 Counter value = Counter.build()
@@ -71,7 +80,7 @@ public class MetricService {
      */
     public Gauge.Child gauge(String name, Map<String, String> labels) {
         TreeMap<String, String> labelMap = new TreeMap<>(labels);
-
+        labelMap.putAll(defaultLabels);
         try {
             String prometheusName = buildName(name);
             gauges.computeIfAbsent(prometheusName, s -> {
@@ -94,6 +103,7 @@ public class MetricService {
      */
     public Summary.Child summary(String name, Map<String, String> labels) {
         TreeMap<String, String> labelMap = new TreeMap<>(labels);
+        labelMap.putAll(defaultLabels);
         try {
             String prometheusName = buildName(name);
             summaries.computeIfAbsent(prometheusName, s -> {
@@ -116,6 +126,7 @@ public class MetricService {
      */
     public Histogram.Child histogram(String name, Map<String, String> labels) {
         TreeMap<String, String> labelMap = new TreeMap<>(labels);
+        labelMap.putAll(defaultLabels);
         try {
             String prometheusName = buildName(name);
             histograms.computeIfAbsent(prometheusName, s -> {
@@ -150,6 +161,9 @@ public class MetricService {
     }
 
      String buildName(String name) {
+        if (prefix == null || prefix.isEmpty()) {
+            return name.toLowerCase().replaceAll("[^A-Za-z0-9]", "_");
+        }
         return (prefix + "_" + name.toLowerCase()).replaceAll("[^A-Za-z0-9]", "_");
     }
 
