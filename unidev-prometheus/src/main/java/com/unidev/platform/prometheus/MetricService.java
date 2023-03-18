@@ -33,6 +33,10 @@ public class MetricService {
 
     private final ConcurrentMap<String, Histogram> histograms = new ConcurrentHashMap<>();
 
+    public MetricService(int prometheusPort) throws IOException {
+        this("", prometheusPort, emptyMap());
+    }
+
     public MetricService(String prefix, int prometheusPort) throws IOException {
         this(prefix, prometheusPort, emptyMap());
     }
