@@ -8,6 +8,7 @@ import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,17 +35,22 @@ public class MetricService {
     private final ConcurrentMap<String, Histogram> histograms = new ConcurrentHashMap<>();
 
     public MetricService(int prometheusPort) throws IOException {
-        this("", prometheusPort, emptyMap());
+        this("", "0.0.0.0", prometheusPort, emptyMap());
     }
 
     public MetricService(String prefix, int prometheusPort) throws IOException {
-        this(prefix, prometheusPort, emptyMap());
+        this(prefix, "0.0.0.0", prometheusPort, emptyMap());
     }
 
-    public MetricService(String prefix, int prometheusPort, Map<String, String> defaultLabels) throws IOException {
+    public MetricService(String prefix, String listenAddress, int prometheusPort) throws IOException {
+        this(prefix, listenAddress, prometheusPort, emptyMap());
+    }
+
+    public MetricService(String prefix, String listenAddress, int prometheusPort, Map<String, String> defaultLabels) throws IOException {
         this.prefix = prefix;
         DefaultExports.initialize();
         this.server = new HTTPServer.Builder()
+                .withInetAddress(InetAddress.getByName(listenAddress))
                 .withPort(prometheusPort)
                 .build();
         this.defaultLabels = defaultLabels;
